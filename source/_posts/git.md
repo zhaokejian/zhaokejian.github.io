@@ -146,14 +146,100 @@ $ git push origin --delete <remote_branch>
 ### 合并分支
 ```bash
 $ git merge <branch>
-#快进合并，合并<branch>到当前分支
+#快进合并（指针指向改变），合并<branch>到当前分支
+
+$ git merge --no-ff <branch>
+#合并<branch>到当前分支，在当前分支生成新节点，保证每个分支的独立演变史
 ```
 ***
 ## 撤销与版本回退
-待续...
+
+### 撤销工作区修改
+有时修改工作区后，发现修改错误，希望回到原来未修改时（上一次提交或暂存）的状态。采用`git checkout`命令：
+```bash
+$ git diff
+#查看工作区未提交（或为暂存）的文件的具体修改
+
+$ git checkout -- <file>
+#恢复工作区指定文件到上一次提交（或暂存）状态
+$ git checkout .
+#撤销所有工作区修改
+```
+
+### 撤销暂存
+```bash
+$ git reset HEAD <file>
+#将指定文件撤出暂存区
+```
+### 版本回退
+希望将版本库回退到之前的提交时，采用`git reset`命令：
+```bash
+$ git log
+#查看之前的版本提交记录
+
+$ git reset HEAD^
+#回退到上一个提交版本，^^代表上两个版本，以此类推。（也可以用~2等代替）
+或
+$ git reset <commitID>
+#commitID可由git log查看得到
+```
+
+有必要整理一下`git reset`命令的三个参数：
+```bash
+$ git reset --soft HEAD^
+#重置版本库头指针，且将这次提交之后的所有变更移动到暂存区
+
+$ git reset --mixed HEAD^
+#默认参数，等同于 git reset HEAD^
+#重置版本库头指针和暂存区，即这次提交之后的所有更改都留在工作区
+
+$ git reset --hard HEAD^
+#重置版本库头指针、暂存区和工作区，即这次提交之后的所有更改都不在存在于当前状态
+```
+在没有将之后的提交推送到远程仓库的情况下，`git reset --hard`是个很危险的操作。若是已经推送到远程仓库，使用`git pull`可以重新获得之后的版本提交。
+若是在没有远程备份时使用`--hard`进行版本回退，又想恢复到之后的版本，在一定时间内（一般为30天）可以通过`git reflog`查看操作id，再使用`git reset --hard <ID>`恢复。
+
+### stash储藏
+有时手头的工作进行到一半，需要切换分支做一些其他事情，可以采用`git stash`命令将当前的工作区储藏起来。
+```bash
+$ git stash
+#储藏当前工作区
+
+$ git stash list
+#查看当前的stash储藏栈
+
+$ git stash apply
+#应用栈顶的储藏内容，恢复工作区到之前的储藏状态
+$ git stash apply stash@{2}
+#应用指定储藏内容
+
+$ git stash pop
+#与apply类似，但从栈中删除该储藏内容
+```
+
 ***
 ## 多人协作
 待续...
 ***
 ## 其他
-待续...
+
+### 状态查看
+```bash
+$ git status
+```
+任何情况下都可以使用`git status`命令查看当前的版本控制状态（包括工作区、暂存区、仓库区），并给出当前状态下可能会用到的命令提示。
+经常使用该命令是好习惯。
+
+### 配置git用户
+```bash
+$ git config user.name "your name"
+$ git config user.email "email@example.com"
+#配置当前目录的git用户，加上--config参数时配置这台机器的所有git仓库
+```
+
+### 协议更改
+有时版本克隆是采用的是https协议，以至于每一次提交都需要输入用户名密码，很麻烦。而使用ssh协议就会方便很多，需要将当前的仓库协议进行更换。
+事实上，重置远程仓库名为ssh协议地址就可以了。
+```bash
+$ git remote origin set-url git@example.com....
+```
