@@ -1,5 +1,7 @@
 ---
 title: Git命令整理
+categories:
+  - 杂
 tags:
   - Git
 date: 2017-07-12 21:29:36
@@ -13,7 +15,7 @@ date: 2017-07-12 21:29:36
 
 ## 四个概念
 借用阮一峰老师文章[《常用Git命令清单》](http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html)中的图。
-![四个概念和常用命令](/images/git_basicConcept.png)
+![四个概念和常用命令](/images/post/git_basicConcept.png)
 
 - Workspace: 工作区，也就是正在编辑的文件目录
 - Index / Stage: 暂存区
