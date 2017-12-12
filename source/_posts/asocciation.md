@@ -8,7 +8,7 @@ tags:
 - 关联规则
 - Apriori算法
 ---
-<script src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default'></script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default'></script>
 # 关联规则概述
 关联规则也是一种 **无监督** 学习方法。是一种 **描述性** 算法而非预测性。所揭示的关系可以被表示为 **关联规则**（asocciation rules）或 **频繁项集**（frequent itemset）。通常用于购物篮中商品购买关联的分析、点击流分析、推荐系统等。
 
