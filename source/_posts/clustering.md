@@ -67,13 +67,13 @@ k-means算法快速简单，就算数据规模较大也有较好的效率表现�
 
 ## R的实现
 以iris数据集中的4个数值变量为例：
-```R
+```r
 data = iris[, -5]
 head(data)
 ```
 ![数据描述](/images/post/clustering/数据描述.png)
 ### 标准化数据
-```R
+```r
 means = sapply(data, mean)
 SD = sapply(data, sd)
 dataScale = scale(data, center = means, scale = SD)
@@ -84,7 +84,7 @@ head(dataScale)
 ### kmeans函数
 其中centers指期望得到的簇数量（即k值），nstart值对于当前k值进行多少次重复计算。
 kmeans函数缺省使用欧氏距离，簇中心为样本点的均值。
-```R
+```r
 clusterModel = kmeans(dataScale, centers = 3, nstart = 10)
 clusterModel
 ```
@@ -97,7 +97,7 @@ clusterModel
 
 ### cluster::pam函数
 簇中心为样本中的一个点，可以指定不同距离计算方式。
-```R
+```r
 library(cluster)
 clusterModel2 = pam(dataScale, k = 3, metric = "Mahalanobis")
 clusterModel2
@@ -128,7 +128,7 @@ clusterModel2
 - 计算类间距离的方法。
 
 采用上文标准化后的数据`dataScale`为例。
-```R
+```r
 #计算距离矩阵
 Dist = dist(dataScale, method = "euclidean")
 
@@ -143,7 +143,7 @@ result
 可以发现最后取出的结果同样是，对于每个样本，给出它所在的簇序列号。
 
 对于层次聚类结果树，可以采用`plot`绘图。
-```R
+```r
 plot(clusterModel3)
 ```
 结果如下：
