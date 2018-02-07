@@ -1,0 +1,910 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="关联规则,Apriori算法," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="关联规则概述关联规则也是一种 无监督 学习方法。是一种 描述性 算法而非预测性。所揭示的关系可以被表示为 关联规则（asocciation rules）或 频繁项集（frequent itemset）。通常用于购物篮中商品购买关联的分析、点击流分析、推荐系统等。 关联规则可以表示为：X → Y (概率)即，当X被购买（观察到）时，Y也会被购买（观察到）的概率。X为LHS，Y为RHS。 关联规则可">
+<meta name="keywords" content="关联规则,Apriori算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关联规则笔记——Apriori算法">
+<meta property="og:url" content="http://yoursite.com/2017/12/10/asocciation/index.html">
+<meta property="og:site_name" content="zhaokejian&#39;s blog">
+<meta property="og:description" content="关联规则概述关联规则也是一种 无监督 学习方法。是一种 描述性 算法而非预测性。所揭示的关系可以被表示为 关联规则（asocciation rules）或 频繁项集（frequent itemset）。通常用于购物篮中商品购买关联的分析、点击流分析、推荐系统等。 关联规则可以表示为：X → Y (概率)即，当X被购买（观察到）时，Y也会被购买（观察到）的概率。X为LHS，Y为RHS。 关联规则可">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/post/asocciation/自下而上迭代图解.png">
+<meta property="og:image" content="http://yoursite.com/images/post/asocciation/Groceries@itemInfo.png">
+<meta property="og:image" content="http://yoursite.com/images/post/asocciation/Groceries@data.png">
+<meta property="og:image" content="http://yoursite.com/images/post/asocciation/apriori函数.png">
+<meta property="og:image" content="http://yoursite.com/images/post/asocciation/inspect检查频繁项集.png">
+<meta property="og:image" content="http://yoursite.com/images/post/asocciation/inspect检查规则.png">
+<meta property="og:image" content="http://yoursite.com/images/post/asocciation/plot_rules.png">
+<meta property="og:updated_time" content="2017-12-19T15:36:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关联规则笔记——Apriori算法">
+<meta name="twitter:description" content="关联规则概述关联规则也是一种 无监督 学习方法。是一种 描述性 算法而非预测性。所揭示的关系可以被表示为 关联规则（asocciation rules）或 频繁项集（frequent itemset）。通常用于购物篮中商品购买关联的分析、点击流分析、推荐系统等。 关联规则可以表示为：X → Y (概率)即，当X被购买（观察到）时，Y也会被购买（观察到）的概率。X为LHS，Y为RHS。 关联规则可">
+<meta name="twitter:image" content="http://yoursite.com/images/post/asocciation/自下而上迭代图解.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"right","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/10/asocciation/"/>
+
+
+
+
+
+  <title>关联规则笔记——Apriori算法 | zhaokejian's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhaokejian's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Step by Step</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/10/asocciation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kejian Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhaokejian's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关联规则笔记——Apriori算法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-10T14:52:59+08:00">
+                2017-12-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据分析算法/" itemprop="url" rel="index">
+                    <span itemprop="name">数据分析算法</span>
+                  </a>
+                </span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据分析算法/关联规则/" itemprop="url" rel="index">
+                    <span itemprop="name">关联规则</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/10/asocciation/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/10/asocciation/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script></p>
+<h1 id="关联规则概述"><a href="#关联规则概述" class="headerlink" title="关联规则概述"></a>关联规则概述</h1><p>关联规则也是一种 <strong>无监督</strong> 学习方法。是一种 <strong>描述性</strong> 算法而非预测性。所揭示的关系可以被表示为 <strong>关联规则</strong>（asocciation rules）或 <strong>频繁项集</strong>（frequent itemset）。通常用于购物篮中商品购买关联的分析、点击流分析、推荐系统等。</p>
+<p>关联规则可以表示为：<strong>X → Y (概率)</strong><br>即，当X被购买（观察到）时，Y也会被购买（观察到）的概率。X为LHS，Y为RHS。</p>
+<p>关联规则可以回答以下问题：</p>
+<ul>
+<li>哪些产品可能会被一起购买？</li>
+<li>与某客户相似的客户倾向于买什么产品？</li>
+<li>对于已经购买某产品的客户，还可能查看或者购买什么其他类似的产品？</li>
+</ul>
+<p><strong>Apriori算法</strong> 是用于生产关联规则的最早的、最基本的算法。</p>
+<hr>
+<h1 id="Apriori算法"><a href="#Apriori算法" class="headerlink" title="Apriori算法"></a>Apriori算法</h1><h2 id="几个概念"><a href="#几个概念" class="headerlink" title="几个概念"></a>几个概念</h2><ul>
+<li><strong>项集</strong>：包含某种关系的一系列项目。可以是一次交易中一起购买的一系列商品，也可以是用户在单个会话中的点击流。</li>
+<li><strong>k项集</strong>：包含k个项目的项集。通常用 \({\lbrace item_1, item_2, …, item_k \rbrace}\) 表示。</li>
+<li><strong>支持度(support)</strong>：给定一个项集L，L的支持度是所有交易中包含L的交易的比例。（\(\frac{包含L的交易}{所有交易}\)）</li>
+<li><strong>频繁项集(frequent itemset)</strong>：出现足够频繁的项集。<strong>足够频繁</strong> 由 <strong>最小支持度(minimum support)</strong> 定义。即用支持度作为指标，对所有项集进行划分，支持度大于最小支持度的项集被定义为频繁项集。</li>
+<li><strong>Apriori属性</strong>（向下封闭性）：如果一个项集被认为是频繁的，那么该频繁项集的任何子集也必定是频繁的。反过来，如果一个项集被认为是不频繁的，那么包含它的项集必定也是不频繁的。Apriori属性是Apriori算法的基础。</li>
+</ul>
+<h2 id="算法流程"><a href="#算法流程" class="headerlink" title="算法流程"></a>算法流程</h2><p>采取一种自下而上的迭代方式。先找到\(k = 1\)的频繁项集，逐步向上找到指定\(k\)的频繁项集。<br><img src="/images/post/asocciation/自下而上迭代图解.png" alt="自下而上迭代图解"></p>
+<p>\(C_k\)表示候选k项集，\(L_k\)表示在\(C_k\)中通过最小支持度筛选的k项集。</p>
+<ol>
+<li>从交易购物篮中确定所有可能项，即1项集\(C_1\)</li>
+<li>计算\(C_1\)的支持度，丢弃（剪枝）支持度小于最小支持度的项，得到\(L_1\)</li>
+<li>由\(L_k\) 生成 \(C_{k+1}\)</li>
+<li>计算\(C_{k+1}\)的支持度，丢弃支持度小于最小支持度的项，得到\(L_{k+1}\)，k ++。</li>
+<li>循环3、4步骤，直到\(L_k\) 为空（不存在大于最小支持度的k项集）或者k达到预设值（频繁k项集中的项数目已经足够大）时停止循环。</li>
+<li>最终得到的频繁项集为\(L_1 \cup L_2 \cup … \cup L_k\)。</li>
+</ol>
+<p>每一个频繁项集中任意取出子集，两两有序组合，可以构造出 <strong>候选规则</strong>。如频繁项集{milk, eggs}可以表示出候选规则{milk} → {eggs}，{eggs} → {milk}</p>
+<h2 id="算法优化"><a href="#算法优化" class="headerlink" title="算法优化"></a>算法优化</h2><p>Apriori算法通过只检查满足了最小支持度的项集，可以减少一定计算量。但是在该算法中，对于每一个级别项集的支持度，都需要扫描整个数据库以获得结果。可以采用以下方法提高效率：</p>
+<ul>
+<li><strong>数据库分区</strong>：交易数据库中任何可能的频繁项集必须在至少一个分区中出现，才被认为是“频繁”的。</li>
+<li><strong>采样</strong>：先用较低支持度阈值提取数据集的一个子集，然后使用子集来执行关联规则挖掘。</li>
+<li><strong>交易压缩</strong>：不包含频繁k项集的交易在后续的扫描中是无用的，可以忽略。</li>
+<li><strong>基于哈希的项集计数</strong>：如果一个k项集相应的哈希桶计数低于某一阈值，则该k项集不可能是频繁的。</li>
+</ul>
+<p>上一段话摘自《数据科学与大数据分析》书籍原文，其中“基于哈希的项集计数”没怎么看懂…网上检索了一些信息后，发现其实是建了一棵哈希树？等弄清楚了再补上这一部分。</p>
+<h2 id="评估候选规则"><a href="#评估候选规则" class="headerlink" title="评估候选规则"></a>评估候选规则</h2><h3 id="度量指标"><a href="#度量指标" class="headerlink" title="度量指标"></a>度量指标</h3><ul>
+<li><strong>置信度（confidence）</strong>：同时包含X和Y的交易与只包含X的交易的比例，（条件概率）。<br>$$Confidence(X \to Y) = \frac{Support(X \land Y)}{Support(X)}$$<br>可以设定最小置信度阈值，用于筛选置信度较高的关联规则。<strong>支持度</strong> 和 <strong>置信度</strong> 是Apriori算法中最为常见和重要的度量方法。<br>然而置信度只考虑先导（X）和共存（XY），没有单独考虑规则的后继（Y）。这种度量方式会导致一个后果：就算X和Y独立分布，如果Y的出现频次很高，X → Y的关联规则就会有很高的置信度，但是Y的出现并不依赖于X。</li>
+</ul>
+<p>因此，引入提升率和杠杆率度量关联规则。这两个量都是X和Y <strong>相关性</strong> 的度量。</p>
+<ul>
+<li><p><strong>提升度（lift）</strong>：测量当X与Y独立分布时，X和Y一起出现的次数比预期多多少。<br>$$Lift(X \to Y) = \frac{Support(X \land Y)}{Support(X) * Support(Y)}$$<br>X和Y独立分布时，值为1，<strong>提升度越大</strong>，表示X和Y的 <strong>关联性越强</strong>。</p>
+</li>
+<li><p><strong>杠杆率</strong>：与提升度类似，但用 <strong>差</strong> 表示（而不是 <strong>比例</strong>）。<br>$$Confidence(X \to Y) = {Support(X \land Y)} - {Support(X)}$$<br>X和Y独立分布时，值为0，<strong>杠杆率越大</strong>，表示X和Y的 <strong>关联性越强</strong>。</p>
+</li>
+</ul>
+<h3 id="主观参数"><a href="#主观参数" class="headerlink" title="主观参数"></a>主观参数</h3><p>即使有较高的置信度和支持度，有的规则也是想当然的、无意义的。比如{paper} → {pencil}并不是有价值的关联规则，因为并不能揭示任何非预期的盈利行为。<br>而像{diaper} → {beer}这样的规则，只要满足了 <strong>最小支持度和最小置信度</strong>（就算没那么高），因为“啤酒和尿布”的组合是令人意外的，就可以在主观上认为是有价值的。</p>
+<h2 id="R的实现"><a href="#R的实现" class="headerlink" title="R的实现"></a>R的实现</h2><p>关联规则和频繁项集处理算法包：<strong>arules</strong><br>对应的可视化包：<strong>arulesViz</strong><br>arules包中定义了一个叫做 <strong>transactions</strong> 的类</p>
+<h3 id="数据解释"><a href="#数据解释" class="headerlink" title="数据解释"></a>数据解释</h3><p>使用arules包中的Groceries数据集做示例，该数据集是一个transactions类，transactions类数据包含三列信息：</p>
+<ul>
+<li>transactionInfo: 一个数据帧，其向量长度与交易的数量相同。</li>
+<li>itemInfo：储存商品标签的数据帧。</li>
+<li>data：二进制关联矩阵，表示每次交易中出现哪些商品标签。</li>
+</ul>
+<p>Groceries数据中，itemInfo标记了所有商品标签，以及每个标签的父级类别（level2是labels的父级类别，level1是level2的父级类别）<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#显示前20个itemInfo</span></span><br><span class="line">Groceries@itemInfo[<span class="number">1</span>:<span class="number">20</span>, ]</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/post/asocciation/Groceries@itemInfo.png" alt="Groceries@itemInfo"></p>
+<p>data是二进制矩阵，1意味着该交易中存在对应商品。每一行为一次交易，每一列对应一个item。<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Groceries@data</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/post/asocciation/Groceries@data.png" alt="Groceries@data"></p>
+<p>Groceries数据集中没有transactionInfo数据，但事实上，transactionInfo是最常见的数据集，每一行为一次交易，包含交易购买的item，长度不固定。itemInfo可以看做从transactionInfo中获得的所有item，data则是根据transactionInfo和itemInfo，将交易数据转换为长度固定的二进制矩阵中的行。</p>
+<h3 id="arules-apriori函数"><a href="#arules-apriori函数" class="headerlink" title="arules::apriori函数"></a>arules::apriori函数</h3><p>arules包中的apriori函数用于执行apriori算法，可以生成频繁项集或是关联规则。<br><img src="/images/post/asocciation/apriori函数.png" alt="apriori函数"></p>
+<h4 id="生成频繁项集"><a href="#生成频繁项集" class="headerlink" title="生成频繁项集"></a>生成频繁项集</h4><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">itemsets = apriori(Groceries, parameter = list(minlen = <span class="number">1</span>, maxlen = <span class="number">4</span>, support = <span class="number">0.02</span>, target = <span class="string">"frequent itemsets"</span>))</span><br></pre></td></tr></table></figure>
+<p><strong>minlen</strong> 设置频繁项集的最小向量长度，<strong>maxlen</strong> 设置最大向量长度（即k值，不设置则默认迭代到频繁k项集 <strong>空</strong> 为止，<strong>support</strong> 设置最小支持度）<br><strong>target</strong> 指定结果，可以是 <strong>频繁项集</strong>（frequent itemsets）也可以是 <strong>规则</strong>（rules）等等。具体查看 <strong>APparameter</strong>。</p>
+<p>使用inspect函数检查频繁项集<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inspect(sort(itemsets, by = <span class="string">"support"</span>))</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/post/asocciation/inspect检查频繁项集.png" alt="inspect检查频繁项集"></p>
+<h4 id="生成规则"><a href="#生成规则" class="headerlink" title="生成规则"></a>生成规则</h4><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rules = apriori(Groceries, parameter = list(support = <span class="number">0.001</span>, confidence = <span class="number">0.6</span>, target = <span class="string">"rules"</span>))</span><br></pre></td></tr></table></figure>
+<p><strong>target</strong> 指定为”<strong>rules</strong>“，<strong>confidence</strong> 设置最小置信度。</p>
+<p>使用inspect函数检查规则<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inspect(sort(rules[<span class="number">1</span>:<span class="number">20</span>], by = <span class="string">"support"</span>))</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/post/asocciation/inspect检查规则.png" alt="inspect检查规则"></p>
+<h4 id="规则的可视化"><a href="#规则的可视化" class="headerlink" title="规则的可视化"></a>规则的可视化</h4><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot(rules)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/post/asocciation/plot_rules.png" alt="plot(rules)"><br>其中，x轴表示支持度，y轴表示置信度，颜色深浅表示提升度。可以发现，最高的提升度发生在一个较低支持度和较低置信度的位置。</p>
+<hr>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li>《数据科学与大数据分析》第5章：关联规则</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/关联规则/" rel="tag"># 关联规则</a>
+          
+            <a href="/tags/Apriori算法/" rel="tag"># Apriori算法</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/05/clustering/" rel="next" title="聚类算法笔记——k-means、层次聚类、密度聚类">
+                <i class="fa fa-chevron-left"></i> 聚类算法笔记——k-means、层次聚类、密度聚类
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div id="sidebar-dimmer"></div>
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpeg"
+               alt="Kejian Zhao" />
+          <p class="site-author-name" itemprop="name">Kejian Zhao</p>
+           
+              <p class="site-description motion-element" itemprop="description">a Postgraduate Student at ZJU</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zhaokejian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/cherry2010jian" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关联规则概述"><span class="nav-number">1.</span> <span class="nav-text">关联规则概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Apriori算法"><span class="nav-number">2.</span> <span class="nav-text">Apriori算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#几个概念"><span class="nav-number">2.1.</span> <span class="nav-text">几个概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#算法流程"><span class="nav-number">2.2.</span> <span class="nav-text">算法流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#算法优化"><span class="nav-number">2.3.</span> <span class="nav-text">算法优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评估候选规则"><span class="nav-number">2.4.</span> <span class="nav-text">评估候选规则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#度量指标"><span class="nav-number">2.4.1.</span> <span class="nav-text">度量指标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主观参数"><span class="nav-number">2.4.2.</span> <span class="nav-text">主观参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#R的实现"><span class="nav-number">2.5.</span> <span class="nav-text">R的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据解释"><span class="nav-number">2.5.1.</span> <span class="nav-text">数据解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#arules-apriori函数"><span class="nav-number">2.5.2.</span> <span class="nav-text">arules::apriori函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#生成频繁项集"><span class="nav-number">2.5.2.1.</span> <span class="nav-text">生成频繁项集</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#生成规则"><span class="nav-number">2.5.2.2.</span> <span class="nav-text">生成规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#规则的可视化"><span class="nav-number">2.5.2.3.</span> <span class="nav-text">规则的可视化</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kejian Zhao</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://zhaokejian.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/12/10/asocciation/';
+          this.page.identifier = '2017/12/10/asocciation/';
+          this.page.title = '关联规则笔记——Apriori算法';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://zhaokejian.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

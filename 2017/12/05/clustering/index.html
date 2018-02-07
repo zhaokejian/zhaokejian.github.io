@@ -1,0 +1,931 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="聚类,k-means,层次聚类,密度聚类," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="聚类概述聚类指的是，通过 无监督 技术对相似的数据对象进行分组形成 簇。簇内相似，簇外相异。所谓“无监督”，指的是不需要人为标注簇的特征，特征在形成簇后才试图解释。聚类不用来做预测，仅仅根据对象属性来查找对象之间的相似性。聚类通常作为分类的第一步，作为更深入的分析或决策过程的前奏。根据不同方法思想，总结k-means聚类、层次聚类、密度聚类。  k-means聚类输入：n个可衡量属性的对象、指定期">
+<meta name="keywords" content="聚类,k-means,层次聚类,密度聚类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="聚类算法笔记——k-means、层次聚类、密度聚类">
+<meta property="og:url" content="http://yoursite.com/2017/12/05/clustering/index.html">
+<meta property="og:site_name" content="zhaokejian&#39;s blog">
+<meta property="og:description" content="聚类概述聚类指的是，通过 无监督 技术对相似的数据对象进行分组形成 簇。簇内相似，簇外相异。所谓“无监督”，指的是不需要人为标注簇的特征，特征在形成簇后才试图解释。聚类不用来做预测，仅仅根据对象属性来查找对象之间的相似性。聚类通常作为分类的第一步，作为更深入的分析或决策过程的前奏。根据不同方法思想，总结k-means聚类、层次聚类、密度聚类。  k-means聚类输入：n个可衡量属性的对象、指定期">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://yoursite.com/images/post/clustering/k-means聚类结果.jpg">
+<meta property="og:image" content="http://yoursite.com/images/post/clustering/数据描述.png">
+<meta property="og:image" content="http://yoursite.com/images/post/clustering/标准化数据结果.png">
+<meta property="og:image" content="http://yoursite.com/images/post/clustering/聚类结果.png">
+<meta property="og:image" content="http://yoursite.com/images/post/clustering/pam函数聚类结果.png">
+<meta property="og:image" content="http://yoursite.com/images/post/clustering/层次聚类结果.png">
+<meta property="og:image" content="http://yoursite.com/images/post/clustering/层次聚类结果树.png">
+<meta property="og:updated_time" content="2017-12-19T15:36:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="聚类算法笔记——k-means、层次聚类、密度聚类">
+<meta name="twitter:description" content="聚类概述聚类指的是，通过 无监督 技术对相似的数据对象进行分组形成 簇。簇内相似，簇外相异。所谓“无监督”，指的是不需要人为标注簇的特征，特征在形成簇后才试图解释。聚类不用来做预测，仅仅根据对象属性来查找对象之间的相似性。聚类通常作为分类的第一步，作为更深入的分析或决策过程的前奏。根据不同方法思想，总结k-means聚类、层次聚类、密度聚类。  k-means聚类输入：n个可衡量属性的对象、指定期">
+<meta name="twitter:image" content="http://yoursite.com/images/post/clustering/k-means聚类结果.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"right","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/05/clustering/"/>
+
+
+
+
+
+  <title>聚类算法笔记——k-means、层次聚类、密度聚类 | zhaokejian's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zhaokejian's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Step by Step</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/05/clustering/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Kejian Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zhaokejian's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">聚类算法笔记——k-means、层次聚类、密度聚类</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-05T16:22:52+08:00">
+                2017-12-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据分析算法/" itemprop="url" rel="index">
+                    <span itemprop="name">数据分析算法</span>
+                  </a>
+                </span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据分析算法/聚类/" itemprop="url" rel="index">
+                    <span itemprop="name">聚类</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/05/clustering/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/05/clustering/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="聚类概述"><a href="#聚类概述" class="headerlink" title="聚类概述"></a>聚类概述</h1><p>聚类指的是，通过 <strong>无监督</strong> 技术对相似的数据对象进行分组形成 <strong>簇</strong>。簇内相似，簇外相异。所谓“无监督”，指的是不需要人为标注簇的特征，特征在形成簇后才试图解释。聚类不用来做预测，仅仅根据对象属性来查找对象之间的相似性。聚类通常作为分类的第一步，作为更深入的分析或决策过程的前奏。<br>根据不同方法思想，总结k-means聚类、层次聚类、密度聚类。</p>
+<hr>
+<h1 id="k-means聚类"><a href="#k-means聚类" class="headerlink" title="k-means聚类"></a>k-means聚类</h1><p>输入：n个可衡量属性的对象、指定期望输出的簇的个数k<br>输出：满足方差最小标准的k个簇</p>
+<p>k-means基于对象与 <strong>簇中心</strong> 的相似度（相似度由 <strong>距离</strong> 衡量），将对象分成k个簇。采用距离作为相似性的评价指标，即认为两个对象的距离越近，其相似度就越大。k-means算法认为簇是由距离靠近的对象组成的，因此把得到紧凑且独立的簇作为最终目标。<br><img src="/images/post/clustering/k-means聚类结果.jpg" alt="k-means聚类结果"></p>
+<h2 id="几个概念"><a href="#几个概念" class="headerlink" title="几个概念"></a>几个概念</h2><ul>
+<li><strong>簇中心</strong>：每个簇中对象的n维属性向量的算术平均值。</li>
+<li><strong>质心(centroid)</strong>：簇中心所在的点。（不知道自己的理解对不对，感觉簇中心跟质心指的概念相似。质心可以是簇中最接近簇中心的对象的位置(像是样本点的中位数)，也可以不与簇中任何对象的位置相同(像是样本点的均值)）</li>
+<li><strong>距离</strong>：在k-means算法中距离一般指的是欧氏距离。</li>
+</ul>
+<h2 id="方法流程"><a href="#方法流程" class="headerlink" title="方法流程"></a>方法流程</h2><ol>
+<li>选定k个质心的初始猜测值（随机选取）。</li>
+<li>对每个点，分别计算它到k个质心的距离，将该点分配给距离最近的质心所在的簇。于是得到k个簇。</li>
+<li>对于每个簇，重新计算簇中心作为新的质心。</li>
+<li>迭代步骤2和3，直到质心不改变，或者质心和所分配的点在两个相邻迭代间来回振荡（存在到两个质心的距离相等的点时），算法收敛。</li>
+</ol>
+<h2 id="一些考量"><a href="#一些考量" class="headerlink" title="一些考量"></a>一些考量</h2><h3 id="诊断"><a href="#诊断" class="headerlink" title="诊断"></a>诊断</h3><p>直观上地，聚类结果可以采用可视化的诊断方式，考虑：</p>
+<ul>
+<li>聚类之间是否较好地相互分离？</li>
+<li>是否存在只有几个点的簇？</li>
+<li>是否有靠得很近的质心？</li>
+</ul>
+<p>如果更多的簇没有形成更好的簇之间的区分，那么 <strong>更少</strong> 的簇应该是更好的选择。</p>
+<h3 id="确定k值"><a href="#确定k值" class="headerlink" title="确定k值"></a>确定k值</h3><p>k-means聚类算法中k值需要人为指定，选取不同的k值对聚类的最终效果产生较大影响。有必要找到一个衡量聚类结果的量化指标。</p>
+<h4 id="使用组内平方和（WSS）的启发式算法"><a href="#使用组内平方和（WSS）的启发式算法" class="headerlink" title="使用组内平方和（WSS）的启发式算法"></a>使用组内平方和（WSS）的启发式算法</h4><p>WSS(Within Sum of Square)，想要通过点与其所在簇的质心间的距离，来衡量聚类结果的好坏。<br>WSS = 所有 <strong>点到点所在簇的质心距离</strong> 的平方和<br>如果这些点相对靠近它们各自的质心，那么WSS将相对较小，聚类结果较好。如果k+1聚类没有 <strong>显著降低</strong> k聚类中的WSS值，那么增加一个簇可能意义不大。</p>
+<p>可以通过绘制WSS值-k值曲线的方式寻找最佳k值，曲线样子类似于反比例函数曲线，选定WSS显著较小后的k值。</p>
+<h4 id="轮廓系数"><a href="#轮廓系数" class="headerlink" title="轮廓系数"></a>轮廓系数</h4><p>轮廓系数（Silhouette Coefficient），是一种相对成熟的聚类效果评价方式。最早由 Peter J. Rousseeuw 在 1986 提出。它综合考虑了 <strong>组内的凝聚度</strong> 和 <strong>组间的分离度</strong>。以此来判断聚类的优良性。取值在-1到+1之间，值越大表示聚类效果越好。</p>
+<h3 id="实际应用时的事项选择"><a href="#实际应用时的事项选择" class="headerlink" title="实际应用时的事项选择"></a>实际应用时的事项选择</h3><ol>
+<li><strong>对象属性</strong>： 尽可能地减少属性的数量。根据属性间的相关性筛选属性，或者将多个属性组合到一个属性中</li>
+<li><strong>属性计量单位</strong>：属性计量单位的选择会改变属性的值，在距离计算中会得到不同的距离（即欧式距离的计算受到量纲的影响），尤其是在与别的属性一起计算距离的时候，某个属性计量单位的改变很有可能会改变距离计算的支配属性。<br>例如：(年龄，身高)，年龄都已年计，身高分别以米和厘米计，计算距离时，(年，米)的单位组合由于年龄一定比身高大很多，距离受到年龄支配。</li>
+<li><strong>属性值调整</strong>：与2的原因相同，由于每个属性值没有统一的度量标准，值大的属性很容易支配距离计算结果。所以在计算距离前需要将属性值 <strong>标准化</strong>。将每种属性除以该属性的标准差，使得新属性值的标准差为1。<br>还可能需要对倾斜数据做取对数处理，使得1000元收入到10000元的距离与10000到100000的距离一样。</li>
+<li><strong>初始质心敏感</strong>：由于初始质心的选择是随机的，就算指定同一个k值，最后的到的结果也不尽相同。故需要对每个k值进行多次聚类计算。</li>
+<li><strong>选择不同方法计算距离</strong>：根据不同的数据集，选择最能反映数据特征的方法计算数据间的距离。距离可以是余弦相似度（cosine similarity）、曼哈顿距离（Manhattan distance）、马氏距离（Mahalanobis distance）等等。</li>
+</ol>
+<p>k-means算法能很容易地应用到有距离概念的数值型数据中，但不能很好地处理分类变量。分类变量可以采用k-mode算法。<br>k-means算法快速简单，就算数据规模较大也有较好的效率表现。但是不适合于非球形的数据（期望的簇不是球形），非球形数据的聚类可以采用密度聚类算法。</p>
+<h2 id="R的实现"><a href="#R的实现" class="headerlink" title="R的实现"></a>R的实现</h2><p>以iris数据集中的4个数值变量为例：<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data = iris[, -<span class="number">5</span>]</span><br><span class="line">head(data)</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/post/clustering/数据描述.png" alt="数据描述"></p>
+<h3 id="标准化数据"><a href="#标准化数据" class="headerlink" title="标准化数据"></a>标准化数据</h3><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">means = sapply(data, mean)</span><br><span class="line">SD = sapply(data, sd)</span><br><span class="line">dataScale = scale(data, center = means, scale = SD)</span><br><span class="line"></span><br><span class="line">head(dataScale)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/post/clustering/标准化数据结果.png" alt="标准化数据结果"></p>
+<h3 id="kmeans函数"><a href="#kmeans函数" class="headerlink" title="kmeans函数"></a>kmeans函数</h3><p>其中centers指期望得到的簇数量（即k值），nstart值对于当前k值进行多少次重复计算。<br>kmeans函数缺省使用欧氏距离，簇中心为样本点的均值。<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">clusterModel = kmeans(dataScale, centers = <span class="number">3</span>, nstart = <span class="number">10</span>)</span><br><span class="line">clusterModel</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/post/clustering/聚类结果.png" alt="聚类结果"><br>结果显示内容如下：</p>
+<ul>
+<li>簇均值的位置</li>
+<li>聚类向量，定义每个样本所属的聚类簇序号</li>
+<li>每个簇的WSS</li>
+<li>所有k均值聚类的相关数据</li>
+</ul>
+<h3 id="cluster-pam函数"><a href="#cluster-pam函数" class="headerlink" title="cluster::pam函数"></a>cluster::pam函数</h3><p>簇中心为样本中的一个点，可以指定不同距离计算方式。<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">library</span>(cluster)</span><br><span class="line">clusterModel2 = pam(dataScale, k = <span class="number">3</span>, metric = <span class="string">"Mahalanobis"</span>)</span><br><span class="line">clusterModel2</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/post/clustering/pam函数聚类结果.png" alt="pam函数聚类结果"></p>
+<h3 id="帮助获得最优k值的函数"><a href="#帮助获得最优k值的函数" class="headerlink" title="帮助获得最优k值的函数"></a>帮助获得最优k值的函数</h3><ul>
+<li><strong>rinds::bestCluster</strong>：输入数据和一个整数向量，可以自动输出轮廓细数最优的聚类数。</li>
+<li><strong>fpc::kmeansruns</strong>：可以根据不同聚类数的求得各自的轮廓系数。</li>
+</ul>
+<hr>
+<h1 id="层次聚类（系统聚类）"><a href="#层次聚类（系统聚类）" class="headerlink" title="层次聚类（系统聚类）"></a>层次聚类（系统聚类）</h1><p>最后得到的结果是一棵聚类树，需要多少个聚类从树中取出。</p>
+<h2 id="方法流程-1"><a href="#方法流程-1" class="headerlink" title="方法流程"></a>方法流程</h2><ol>
+<li>首先将每个样本单独作为一类</li>
+<li>将不同类之间距离最近的类进行合并</li>
+<li>重新计算类间距离</li>
+<li>循环操作步骤2、3，直到所有样本归为一类</li>
+</ol>
+<p>可以采用不同距离作为类间距离的计算标准：最短距离法、最长距离法、类平均法、重心法、中间聚类法、离差平方和法。</p>
+<h2 id="R的实现-1"><a href="#R的实现-1" class="headerlink" title="R的实现"></a>R的实现</h2><h3 id="stats-hclust函数"><a href="#stats-hclust函数" class="headerlink" title="stats::hclust函数"></a>stats::hclust函数</h3><p>输入为距离矩阵，不需要原始数据，同样需要标准化数据。<br>重要参数包括：</p>
+<ul>
+<li>样本间的距离矩阵</li>
+<li>计算类间距离的方法。</li>
+</ul>
+<p>采用上文标准化后的数据<code>dataScale</code>为例。<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#计算距离矩阵</span></span><br><span class="line">Dist = dist(dataScale, method = <span class="string">"euclidean"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#得到hclust层次聚类结果树</span></span><br><span class="line">clusterModel3 = hclust(Dist, method = <span class="string">"ward"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#从结果树中获得k = 3的聚类结果</span></span><br><span class="line">result = cutree(clusterModel3, k = <span class="number">3</span>)</span><br><span class="line">result</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/post/clustering/层次聚类结果.png" alt="层次聚类结果"><br>可以发现最后取出的结果同样是，对于每个样本，给出它所在的簇序列号。</p>
+<p>对于层次聚类结果树，可以采用<code>plot</code>绘图。<br><figure class="highlight r"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot(clusterModel3)</span><br></pre></td></tr></table></figure></p>
+<p>结果如下：<br><img src="/images/post/clustering/层次聚类结果树.png" alt="层次聚类结果树"></p>
+<hr>
+<h1 id="密度聚类"><a href="#密度聚类" class="headerlink" title="密度聚类"></a>密度聚类</h1><p>可以帮助识别非球形的簇。寻找那些被低密度区域所分离的高密度区域。<br>典型的密度聚类算法包括DBSCAN算法。</p>
+<h2 id="DBSCAN算法"><a href="#DBSCAN算法" class="headerlink" title="DBSCAN算法"></a>DBSCAN算法</h2><p>该算法将所有点分为三类：</p>
+<ul>
+<li><strong>核心点</strong>：如果某个点的邻域内的点个数超过某个阈值，则该点为核心点。（邻域由半径参数eps决定，阈值由MiniPts参数决定）</li>
+<li><strong>边界点</strong>：如果某个点不是核心点，但它落在核心点的邻域内，则该点为边界点。</li>
+<li><strong>噪声点</strong>：既不是核心点也不是边界点的点。</li>
+</ul>
+<p>算法先将所有的点标记为以上三类。然后将任意两个距离小于eps的核心点归为同一簇。任何与核心点足够近的边界点也放到与之相同的簇中。</p>
+<p>在R中可以采用fpc::dbscan函数实现</p>
+<h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><ul>
+<li>优点：可以对抗噪声并且处理任意形状和大小的簇。</li>
+<li>缺点：稀疏点集合中的密度很难定义，效果较差。算法对于计算资源的消耗很大。</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li>《数据科学与大数据分析》第4章：聚类</li>
+<li>《数据科学中的R语言》第8章 第2节：聚类</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/聚类/" rel="tag"># 聚类</a>
+          
+            <a href="/tags/k-means/" rel="tag"># k-means</a>
+          
+            <a href="/tags/层次聚类/" rel="tag"># 层次聚类</a>
+          
+            <a href="/tags/密度聚类/" rel="tag"># 密度聚类</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/12/git/" rel="next" title="Git命令整理">
+                <i class="fa fa-chevron-left"></i> Git命令整理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/10/asocciation/" rel="prev" title="关联规则笔记——Apriori算法">
+                关联规则笔记——Apriori算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div id="sidebar-dimmer"></div>
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpeg"
+               alt="Kejian Zhao" />
+          <p class="site-author-name" itemprop="name">Kejian Zhao</p>
+           
+              <p class="site-description motion-element" itemprop="description">a Postgraduate Student at ZJU</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/zhaokejian" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/cherry2010jian" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#聚类概述"><span class="nav-number">1.</span> <span class="nav-text">聚类概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#k-means聚类"><span class="nav-number">2.</span> <span class="nav-text">k-means聚类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#几个概念"><span class="nav-number">2.1.</span> <span class="nav-text">几个概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法流程"><span class="nav-number">2.2.</span> <span class="nav-text">方法流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些考量"><span class="nav-number">2.3.</span> <span class="nav-text">一些考量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#诊断"><span class="nav-number">2.3.1.</span> <span class="nav-text">诊断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#确定k值"><span class="nav-number">2.3.2.</span> <span class="nav-text">确定k值</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用组内平方和（WSS）的启发式算法"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">使用组内平方和（WSS）的启发式算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#轮廓系数"><span class="nav-number">2.3.2.2.</span> <span class="nav-text">轮廓系数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实际应用时的事项选择"><span class="nav-number">2.3.3.</span> <span class="nav-text">实际应用时的事项选择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#R的实现"><span class="nav-number">2.4.</span> <span class="nav-text">R的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标准化数据"><span class="nav-number">2.4.1.</span> <span class="nav-text">标准化数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#kmeans函数"><span class="nav-number">2.4.2.</span> <span class="nav-text">kmeans函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cluster-pam函数"><span class="nav-number">2.4.3.</span> <span class="nav-text">cluster::pam函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#帮助获得最优k值的函数"><span class="nav-number">2.4.4.</span> <span class="nav-text">帮助获得最优k值的函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#层次聚类（系统聚类）"><span class="nav-number">3.</span> <span class="nav-text">层次聚类（系统聚类）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#方法流程-1"><span class="nav-number">3.1.</span> <span class="nav-text">方法流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#R的实现-1"><span class="nav-number">3.2.</span> <span class="nav-text">R的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#stats-hclust函数"><span class="nav-number">3.2.1.</span> <span class="nav-text">stats::hclust函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#密度聚类"><span class="nav-number">4.</span> <span class="nav-text">密度聚类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DBSCAN算法"><span class="nav-number">4.1.</span> <span class="nav-text">DBSCAN算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#优缺点"><span class="nav-number">4.1.1.</span> <span class="nav-text">优缺点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Kejian Zhao</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://zhaokejian.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/12/05/clustering/';
+          this.page.identifier = '2017/12/05/clustering/';
+          this.page.title = '聚类算法笔记——k-means、层次聚类、密度聚类';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://zhaokejian.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
