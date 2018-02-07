@@ -313,8 +313,8 @@ han: false
 
 # Disqus
 disqus:
-  enable: false
-  shortname:
+  enable: true
+  shortname: "zhaokejian"
   count: true
 
 # Hypercomments
